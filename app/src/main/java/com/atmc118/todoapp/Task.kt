@@ -1,9 +1,14 @@
 package com.atmc118.todoapp
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.util.*
 
-class Task {
-    var task:String = ""
-    var time:Date = Date()
-    var isDone:Boolean = false
-}
+@Entity(tableName = "todos")
+data class Task (
+    @PrimaryKey(autoGenerate = true)
+    val id:Int = 0,
+    val task:String = "",
+    val time:Date = Date(),
+    val isDone:Boolean = false
+)
