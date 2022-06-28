@@ -13,6 +13,9 @@ interface ToDoDao {
 
     @Delete
     fun delete(todo: Task)
+
+    @Update
+    fun update(todo:Task)
 }
 
 class DateTimeConverter {

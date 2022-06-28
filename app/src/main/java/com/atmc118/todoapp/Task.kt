@@ -10,5 +10,5 @@ data class Task (
     val id:Int = 0,
     val task:String = "",
     val time:Date = Date(),
-    val isDone:Boolean = false
+    var isDone:Boolean = false
 )

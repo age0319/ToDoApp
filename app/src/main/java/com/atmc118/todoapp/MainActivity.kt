@@ -50,7 +50,6 @@ class MainActivity : ComponentActivity() {
     fun MainScreen(todoList: SnapshotStateList<Task>) {
 
         var text: String by remember { mutableStateOf("") }
-        val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
 
         Column {
             TopAppBar(
@@ -62,36 +61,7 @@ class MainActivity : ComponentActivity() {
                     .weight(1f)
             ) {
                 items(todoList) { todo ->
-                    var checkedState:Boolean by remember { mutableStateOf(false) }
-                    Row( modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .clickable(onClick = { deleteTodo(todo) })) {
-                        Checkbox(
-                            checked = checkedState,
-                            onCheckedChange = {
-                                checkedState = it
-                            })
-                        if(checkedState) {
-                            Text(
-                                text = todo.task,
-                                style = TextStyle(textDecoration = TextDecoration.LineThrough),
-                                modifier = Modifier
-                                    .padding(16.dp)
-                            )
-                        }else{
-                            Text(
-                                text = todo.task,
-                                modifier = Modifier
-                                    .padding(16.dp))
-                        }
-                        Text(
-                            text = sdf.format(todo.time),
-                            color = Color.LightGray,
-                            modifier = Modifier
-                                .padding(16.dp)
-                        )
-                    }
+                    oneResult(todo = todo)
                 }
             }
             Row(
@@ -119,6 +89,43 @@ class MainActivity : ComponentActivity() {
                     Text("ADD")
                 }
             }
+        }
+    }
+    
+    @Composable
+    private fun oneResult(todo:Task){
+        val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+        var checkedState:Boolean by remember { mutableStateOf(todo.isDone) }
+        Row( modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+        ) {
+            Checkbox(
+                checked = checkedState,
+                onCheckedChange = {
+                    checkedState = it
+                    todo.isDone = it
+                    updateTodo(todo)
+                })
+            if(checkedState) {
+                Text(
+                    text = todo.task,
+                    style = TextStyle(textDecoration = TextDecoration.LineThrough),
+                    modifier = Modifier
+                        .padding(16.dp)
+                )
+            }else{
+                Text(
+                    text = todo.task,
+                    modifier = Modifier
+                        .padding(16.dp))
+            }
+            Text(
+                text = sdf.format(todo.time),
+                color = Color.LightGray,
+                modifier = Modifier
+                    .padding(16.dp)
+            )
         }
     }
 
@@ -154,14 +161,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview() {
-        ToDoAppTheme {
-            MainScreen(todoList)
+    private fun updateTodo(todo: Task){
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.Default) {
+                dao.update(todo)
+            }
         }
     }
 
 }
 
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    ToDoAppTheme {
+//        MainScreen(todoList)
+    }
+}
 
